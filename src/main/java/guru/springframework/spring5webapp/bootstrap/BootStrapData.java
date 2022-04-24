@@ -9,6 +9,11 @@ import guru.springframework.spring5webapp.repositories.PublisherRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Random;
+
 @Component
 public class BootStrapData implements CommandLineRunner {
 
@@ -24,43 +29,38 @@ public class BootStrapData implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
         System.out.println("Started in Bootstrap");
 
-        Publisher publisher = new Publisher();
-        publisher.setName("SFG Publishing");
-        publisher.setCity("St Petersburg");
-        publisher.setState("FL");
-
+        Publisher publisher = new Publisher(randomString(), randomString(), randomString(), randomString(), randomString());
         publisherRepository.save(publisher);
 
+        generateData(publisher);
+        System.out.println("Number of Books: " + bookRepository.count());
         System.out.println("Publisher Count: " + publisherRepository.count());
 
-        Author eric = new Author("Eric", "Evans");
-        Book ddd = new Book("Domain Driven Design", "123123");
-        eric.getBooks().add(ddd);
-        ddd.getAuthors().add(eric);
+    }
 
-        ddd.setPublisher(publisher);
-        publisher.getBooks().add(ddd);
 
-        authorRepository.save(eric);
-        bookRepository.save(ddd);
-        publisherRepository.save(publisher);
 
-        Author rod = new Author("Rod", "Johnson");
-        Book noEJB = new Book("J2EE Development without EJB", "3939459459");
-        rod.getBooks().add(noEJB);
-        noEJB.getAuthors().add(rod);
+    private void generateData(Publisher publisher) {
+        for (int i = 0, j = 0; i < 20; i++) {
+            Author author = new Author(randomString(), randomString());
+            Book book = new Book(randomString(), randomString());
+            author.getBooks().add(book);
+            book.getAuthors().add(author);
+            book.setPublisher(publisher);
+            publisher.getBooks().add(book);
+            authorRepository.save(author);
+            bookRepository.save(book);
+            publisherRepository.save(publisher);
+        }
+    }
 
-        noEJB.setPublisher(publisher);
-        publisher.getBooks().add(noEJB);
-
-        authorRepository.save(rod);
-        bookRepository.save(noEJB);
-        publisherRepository.save(publisher);
-
-        System.out.println("Number of Books: " + bookRepository.count());
-        System.out.println("Publisher Number of Books: " + publisher.getBooks().size());
+    private String randomString() {
+        return new Random()
+                .ints(97, 123)
+                .limit(10)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
     }
 }
