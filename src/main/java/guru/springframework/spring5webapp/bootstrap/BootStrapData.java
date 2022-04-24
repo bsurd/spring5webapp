@@ -9,8 +9,6 @@ import guru.springframework.spring5webapp.repositories.PublisherRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.HashSet;
-
 @Component
 public class BootStrapData implements CommandLineRunner {
 
@@ -26,34 +24,37 @@ public class BootStrapData implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        Publisher p0 = new Publisher();
+
+        publisherRepository.save(p0);
 
         Author a1 = new Author();
         Book b1 = new Book();
         a1.getBooks().add(b1);
         b1.getAuthors().add(a1);
+        b1.setPublisher(p0);
+        p0.getBooks().add(b1);
 
         authorRepository.save(a1);
         bookRepository.save(b1);
+        publisherRepository.save(p0);
 
         Author a2 = new Author();
         Book b2 = new Book();
         a2.getBooks().add(b2);
         b2.getAuthors().add(a2);
+        b2.setPublisher(p0);
+        p0.getBooks().add(b2);
 
         authorRepository.save(a2);
         bookRepository.save(b2);
-
-        Publisher p1 = new Publisher();
-        Publisher p2 = new Publisher();
-
-        publisherRepository.save(p1);
-        publisherRepository.save(p2);
+        publisherRepository.save(p0);
 
         System.out.println("-----------------");
         System.out.println("Started in bootstrap");
-        System.out.println("Number of books: " + bookRepository.count());
-        System.out.println("-----------------");
-        System.out.println("Number of publishers: " + publisherRepository.count());
+        System.out.println("Publisher count: " + publisherRepository.count());
+        System.out.println("Number of Books: " + bookRepository.count());
+        System.out.println("Publisher Number of Books: " + p0.getBooks().size());
 
     }
 
